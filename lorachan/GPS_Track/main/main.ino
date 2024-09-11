@@ -37,6 +37,7 @@
 void WebFS(void);
 void gps_time(char *, uint8_t);
 
+
 char t_buf[16];
 
 AXP20X_Class axp;
@@ -66,9 +67,11 @@ typedef struct {
     float humidity;
     float baro_altitude;
     float ext_temperature;
+    unsigned int CP10Sec = 0;  // Geiger Count
 } Data;
 
 Data data;
+
 
 char log_entry[LINE_SIZE];
 
@@ -329,6 +332,8 @@ void setup()
     bme280_setup();
     //Init DFRotbot max31855 external temperature
     DFRobot_max31855_setup();
+    //Init SKUSEN0463 geiger counter
+    SKUSEN0463_setup();
     // Init LoRa
     lora_setup();
 
@@ -393,7 +398,8 @@ void loop() {
     data.pressure        = bme280_pressure();
     data.humidity        = bme280_humidity();
     data.baro_altitude   = bme280_baro_altitude();
-    data.ext_temperature = DFRobot_max31855_temperature(); 
+    data.ext_temperature = DFRobot_max31855_temperature();
+    data.CP10Sec         = getCP10Sec();
 
     // Send every 10000 millis
     LoRaSend();
@@ -402,8 +408,8 @@ void loop() {
     memset(log_entry, 0, LINE_SIZE);
     //snprintf(log_entry, LINE_SIZE, "%05i: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 \n", data.seq);
     gps_time(t_buf, sizeof(t_buf));
-    printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f\n", t_buf, data.pressure, data.ext_temperature, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude);
-    snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f\n", t_buf, data.pressure, data.ext_temperature, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude);
+    printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d\n", t_buf, data.pressure, data.ext_temperature, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
+    snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f,%d\n", t_buf, data.pressure, data.ext_temperature, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
     logger(log_entry); // Max. 22272 records de 64 bytes
 
     delay(10000);
