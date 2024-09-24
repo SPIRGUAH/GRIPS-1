@@ -3,7 +3,7 @@
  */
 
 
-const int geigerPin = 25; // Pin GPIO 21 in ESP32
+const int geigerPin = 25; // Pin GPIO 25 in ESP32
 
 volatile unsigned long pulseCount = 0;  // Pulse counter
 

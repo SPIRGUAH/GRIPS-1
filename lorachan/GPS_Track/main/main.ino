@@ -90,6 +90,7 @@ void readFile(const char * path){
         Serial.write(file.read());
     }
     file.close();
+
 }
 
 // -----------------------------------------------------------------------------
@@ -399,7 +400,8 @@ void loop() {
     data.humidity        = bme280_humidity();
     data.baro_altitude   = bme280_baro_altitude();
     data.ext_temperature = DFRobot_max31855_temperature();
-    data.CP10Sec         = getCP10Sec();
+    //data.CP10Sec         = getCP10Sec();
+    data.CP10Sec = random(0,15);
 
     // Send every 10000 millis
     LoRaSend();

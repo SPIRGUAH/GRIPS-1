@@ -74,6 +74,7 @@ typedef struct {
     float humidity;
     float baro_altitude;
     float ext_temperature;
+    unsigned int CP10Sec = 0;  // Geiger Count
 } Data;
 // -----------------------------------------------------------------------------
 // Application
@@ -96,6 +97,7 @@ int LoRaReceive()
     float humidity;
     float baro_altitude;
     float ext_temperature;
+    unsigned int CP10Sec;
 
     Data data;
 
@@ -132,6 +134,7 @@ int LoRaReceive()
         humidity       = data.humidity;
         baro_altitude  = data.baro_altitude;
         ext_temperature = data.ext_temperature;
+        CP10Sec = data.CP10Sec;
 
         Serial.print("Latitude: ");
         Serial.println(latitude);
@@ -151,6 +154,8 @@ int LoRaReceive()
         Serial.println(baro_altitude);
         Serial.print("External Temperature: ");
         Serial.println(ext_temperature);
+        Serial.print("Geiger Count: ");
+        Serial.println(CP10Sec);
 
         // print RSSI of packet
         Serial.print("RSSI: ");
@@ -208,6 +213,11 @@ int LoRaReceive()
         {
             sprintf(buf, "%3.6f", baro_altitude);  
             client.publish("globo/baro_altitude", buf);
+        }
+        if (CP10Sec < 0){
+
+            sprintf(buf, "%d", CP10Sec);  
+            client.publish("globo/CP10Sec", buf);
         }
 
         //Send Traccar Balloon data
