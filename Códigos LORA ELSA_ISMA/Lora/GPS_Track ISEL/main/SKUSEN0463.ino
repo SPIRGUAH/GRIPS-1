@@ -15,7 +15,7 @@ void SKUSEN0463_setup(void)
 {
     Serial.println("SKUSEN0463 setup");
     pinMode(geigerPin1, INPUT);
-    attachInterrupt(digitalPinToInterrupt(geigerPin1), countPulse, RISING);
+    attachInterrupt(digitalPinToInterrupt(geigerPin1), countPulse1, RISING);
 }  
 
 // Interrupt function

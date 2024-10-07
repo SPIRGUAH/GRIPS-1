@@ -15,7 +15,7 @@ void libelium_setup(void)
 {
     Serial.println("libelium setup");
     pinMode(geigerPin2, INPUT);
-    attachInterrupt(digitalPinToInterrupt(geigerPin2), countPulse, RISING);
+    attachInterrupt(digitalPinToInterrupt(geigerPin2), countPulse2, RISING);
 }  
 
 // Interrupt function
