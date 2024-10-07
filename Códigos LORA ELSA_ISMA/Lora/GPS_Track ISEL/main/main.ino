@@ -66,7 +66,8 @@ typedef struct {
     float humidity;
     float baro_altitude;
     float ext_temperature_ours;
-    unsigned int CP10Sec;
+    unsigned int CP10SecDFRobot;
+    unsigned int CP10SecLibelium;
 } Data;
 
 Data data;
@@ -332,6 +333,8 @@ void setup()
     DS18B20_setup();;
     // Init SKUSEN0463 geiger counter
     SKUSEN0463_setup();
+    // Init Libelium geiger counter
+    libelium_setup();
     // Init LoRa
     lora_setup();
 
@@ -398,7 +401,8 @@ void loop() {
     data.humidity        = bme280_humidity();
     data.baro_altitude   = bme280_baro_altitude();
     data.ext_temperature_ours = DS18B20_tempC();
-    data.CP10Sec         = getCP10Sec();
+    data.CP10Sec1         = getCP10Sec1();
+    data.CP10Sec2         = getCP10Sec2();
 
     // Send every 10000 millis
     LoRaSend();
@@ -407,8 +411,8 @@ void loop() {
     memset(log_entry, 0, LINE_SIZE);
     //snprintf(log_entry, LINE_SIZE, "%05i: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 \n", data.seq);
     gps_time(t_buf, sizeof(t_buf));
-    printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
+    printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec1, data.CP10Sec2);
+    snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f,%d,%d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec1, data.CP10Sec2);
     logger(log_entry); // Max. 22272 records de 64 bytes
 
     delay(10000);

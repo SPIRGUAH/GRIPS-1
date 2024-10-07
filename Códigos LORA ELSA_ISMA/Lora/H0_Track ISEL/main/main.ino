@@ -75,7 +75,8 @@ typedef struct {
     float humidity;
     float baro_altitude;
     float ext_temperature_ours;
-    unsigned int CP10Sec;
+    unsigned int CP10Sec1;
+    unsigned int CP10Sec2;
 } Data;
 // -----------------------------------------------------------------------------
 // Application
@@ -98,7 +99,8 @@ int LoRaReceive()
     float humidity;
     float baro_altitude;
     float ext_temperature_ours;
-    unsigned int CP10Sec;
+    unsigned int CP10Sec1;
+    unsigned int CP10Sec2;
 
     Data data;
 
@@ -135,7 +137,8 @@ int LoRaReceive()
         humidity       = data.humidity;
         baro_altitude  = data.baro_altitude;
         ext_temperature_ours = data.ext_temperature_ours;
-        CP10Sec        = data.CP10Sec;
+        CP10Sec1        = data.CP10Sec1;
+        CP10Sec2        = data.CP10Sec2;
 
         Serial.print("Latitude: ");
         Serial.println(latitude);
@@ -155,8 +158,10 @@ int LoRaReceive()
         Serial.println(baro_altitude);
         Serial.print("External Temperature: ");
         Serial.println(ext_temperature_ours);
-        Serial.print("Geiger count: ");
-        Serial.println(CP10Sec);
+        Serial.print("Geiger count DF Robot: ");
+        Serial.println(CP10Sec1);
+        Serial.print("Geiger count Libelium: ");
+        Serial.println(CP10Sec2);
 
         // print RSSI of packet
         Serial.print("RSSI: ");
@@ -215,11 +220,12 @@ int LoRaReceive()
             sprintf(buf, "%3.6f", baro_altitude);  
             client.publish("globo/baro_altitude", buf);
         }
-        if (CP10Sec >= 0)
-        {
-            sprintf(buf, "%d", CP10Sec);  
-            client.publish("globo/CP10Sec", buf);
-        }
+        sprintf(buf, "%d", CP10Sec1);  
+        client.publish("globo/CP10Sec1", buf);
+    
+        sprintf(buf, "%d", CP10Sec2);  
+        client.publish("globo/CP10Sec2", buf);
+        
 
         //Send Traccar Balloon data
         if (altitude > 0)

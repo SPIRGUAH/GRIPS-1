@@ -1,31 +1,31 @@
 /*
- GEIGER COUNTER CODE
+ GEIGER COUNTER 1 CODE
  */
 
 
-const int geigerPin = 25; // Pin GPIO 25 in ESP32
+const int geigerPin1 = 25; // Pin GPIO 25 in ESP32
 
-volatile unsigned long pulseCount = 0;  // Pulse counter
+volatile unsigned long pulseCount1 = 0;  // Pulse counter
 
-const unsigned long interval = 10000;   // Count interval
+const unsigned long interval1 = 10000;   // Count interval
 
 
 
 void SKUSEN0463_setup(void)
 {
     Serial.println("SKUSEN0463 setup");
-    pinMode(geigerPin, INPUT);
-    attachInterrupt(digitalPinToInterrupt(geigerPin), countPulse, RISING);
+    pinMode(geigerPin1, INPUT);
+    attachInterrupt(digitalPinToInterrupt(geigerPin1), countPulse, RISING);
 }  
 
 // Interrupt function
-void countPulse() {
-  pulseCount++;  
+void countPulse1() {
+  pulseCount1++;  
 }
 
-unsigned long getCP10Sec() {
-  unsigned long counts = pulseCount;
-  pulseCount = 0;  // Restart counter
+unsigned long getCP10Sec1() {
+  unsigned long counts = pulseCount1;
+  pulseCount1 = 0;  // Restart counter
   return counts;
 }
 
