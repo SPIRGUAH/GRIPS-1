@@ -527,15 +527,19 @@ void loop() {
     LoRaSend();
     data.seq++;
 
-    memset(log_entry, 0, LINE_SIZE);
+    memset(log_entry, '', LINE_SIZE);
     //snprintf(log_entry, LINE_SIZE, "%05i: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 \n", data.seq);
     gps_time(t_buf, sizeof(t_buf));
     printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
+    int len = snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
+    if (len >= LINE_SIZE) {  
+        Serial.printf("[ERROR] Buffer demasiado pequeño: %d bytes escritos en un buffer de %d bytes\n", len, LINE_SIZE);
+    }
+
     logger(log_entry); // Max. 22272 records de 64 bytes
     Serial.println(baChStatus);
     Serial.print("  Batt Voltage = "); 
-    Serial.println((float)axp_2101.getBattVoltage()/1000.0);  
+    Serial.println((float)axp_2101.getBattVoltage()/1000.0,2);  
     Serial.println(axp_2101.getBatteryPercent());  
 
 
