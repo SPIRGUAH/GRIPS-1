@@ -68,8 +68,8 @@ const char* password = "PASSWORD";  // change this for your own network
 //const char* ssid     = "Alifanfaron";     // change this for your own network
 //const char* password = "MZRSSP_1968";  // change this for your own network
 
-WiFiClient espClient1212;
-PubSubClient client(espClient1212);
+WiFiClient espClient3434;
+PubSubClient client(espClient3434);
 
 typedef struct {
     byte TX_ID;

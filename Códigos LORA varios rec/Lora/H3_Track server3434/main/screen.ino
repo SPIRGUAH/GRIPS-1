@@ -37,7 +37,7 @@ void _screen_header() {
     char buffer[20];
 
     // Message count
-    snprintf(buffer, sizeof(buffer), "# SAT2");
+    snprintf(buffer, sizeof(buffer), "# SAT3");
     display->setTextAlignment(TEXT_ALIGN_LEFT);
     display->drawString(0, 2, buffer);
 

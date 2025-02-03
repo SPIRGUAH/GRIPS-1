@@ -102,6 +102,7 @@ bool logger(char *entry)
     if (line == FLASH_BLOCK_SIZE / LINE_SIZE)
     {
         write_buf();
+        Serial.print ("Block sent");
         line = 0;
     }
     return true;
