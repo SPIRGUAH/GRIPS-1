@@ -534,11 +534,10 @@ void loop() {
     gps_time(t_buf, sizeof(t_buf));
     printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
     snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    logger(log_entry); // Max. 22272 records de 64 bytes
     */
     
     
-    
+    /*
     memset(log_entry, 0, LINE_SIZE);
     //snprintf(log_entry, LINE_SIZE, "%05i: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 \n", data.seq);
     gps_time(t_buf, sizeof(t_buf));
@@ -549,9 +548,34 @@ void loop() {
     }else{
         memset(log_entry + len, ' ', LINE_SIZE - 1 - len); // Rellenar con espacios
     }
-    log_entry[LINE_SIZE - 1] = '\0'; // Asegurar terminación
-    logger(log_entry); // Max. 22272 records de 64 bytes
+    log_entry[LINE_SIZE - 1] = '\0'; // Asegurar terminación    
+    */
 
+    // Inicializar el buffer con espacios
+    memset(log_entry, ' ', LINE_SIZE - 1);
+    log_entry[LINE_SIZE - 1] = '\0'; // Terminar correctamente el buffer
+
+    // Generar la marca de tiempo en t_buf
+    gps_time(t_buf, sizeof(t_buf));
+
+    // Usar snprintf para escribir en log_entry
+    int len = snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f,%d\n",
+                    t_buf, data.pressure, data.ext_temperature_ours, data.temperature,
+                    data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
+
+    // Validar si snprintf truncó la salida
+    if (len >= LINE_SIZE) {
+        Serial.printf("[ERROR] Buffer demasiado pequeño: %d bytes escritos en un buffer de %d bytes\n", len, LINE_SIZE);
+        log_entry[LINE_SIZE - 1] = '\0'; // Terminar correctamente para evitar errores
+    } else {
+        // Rellenar cualquier espacio restante con espacios (evita residuos de \x00)
+        if (len < LINE_SIZE - 1) {
+            memset(log_entry + len, ' ', LINE_SIZE - 1 - len);
+        }
+        log_entry[LINE_SIZE - 1] = '\0'; // Terminar correctamente
+    }
+
+    logger(log_entry); // Max. 22272 records de 64 bytes
     Serial.print ("Size of log: ");
     Serial.println(sizeof(log_entry));
     Serial.println(baChStatus);
