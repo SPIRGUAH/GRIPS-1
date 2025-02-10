@@ -36,7 +36,7 @@ bool logger(char * entry)
 #include <LittleFS.h>
 #include "logger.h"
 
-#define EXPECTED_COLUMNS 9 // Número esperado de columnas en la trama
+#define EXPECTED_COLUMNS 10 // Número esperado de columnas en la trama
 
 static u_int8_t buf[FLASH_BLOCK_SIZE];
 static int line = 0;
