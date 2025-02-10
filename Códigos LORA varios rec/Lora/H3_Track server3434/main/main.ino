@@ -196,7 +196,7 @@ int LoRaReceive()
             client.publish("globo/altitude", buf);
         }       
         snprintf(buf, sizeof(buf), "%i", LoRa.packetRssi());
-        client.publish("globo/RSSI2", buf);
+        client.publish("globo/RSSI3", buf);
         sprintf(buf, "%3.6f", hdop);  
         client.publish("globo/hdop", buf);
         if ((ext_temperature_ours < 80) && (ext_temperature_ours > -128))
