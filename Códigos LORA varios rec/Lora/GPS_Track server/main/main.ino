@@ -81,7 +81,7 @@ typedef struct {
     float baro_altitude;
     float ext_temperature_ours;
     unsigned int CP10Sec_Gravity;
-    unsigned int CP10Sec_Libellium;
+    //unsigned int CP10Sec_Libellium;
 } Data;
 
 Data data;
@@ -445,7 +445,7 @@ void setup()
     DS18B20_setup(); 
     // Init SKUSEN0463 geiger counter
     Gravity_setup();
-    Libellium_setup();
+    //Libellium_setup();
     
     // Init LoRa
     lora_setup();
@@ -524,7 +524,7 @@ void loop() {
     //data.ext_temperature_ours = DS18B20_tempC_dummy();
 
     data.CP10Sec_Gravity         = getCP10Sec_Gravity();
-    data.CP10Sec_Libellium       = getCP10Sec_Libellium();
+    //data.CP10Sec_Libellium       = getCP10Sec_Libellium();
 
     //data.CP10Sec_Gravity         = getCP10Sec_dummy();
     //data.CP10Sec_Libellium       = getCP10Sec_dummy();
@@ -564,9 +564,9 @@ void loop() {
     gps_time(t_buf, sizeof(t_buf));
 
     // Usar snprintf para escribir en log_entry
-    int len = snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f,%d,%d\n",
+    int len = snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f,%d\n",
                     t_buf, data.pressure, data.ext_temperature_ours, data.temperature,
-                    data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec_Gravity,data.CP10Sec_Libellium);
+                    data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec_Gravity);
 
     // Validar si snprintf truncó la salida
     if (len >= LINE_SIZE) {
@@ -583,7 +583,7 @@ void loop() {
     logger(log_entry); // Max. 22272 records de 64 bytes
     Serial.print ("Size of log: ");
     Serial.println(sizeof(log_entry));
-    Serial.println("Tiempo, Pressure, T_ext,T_int, Humidity, altitude (m), longitude, latitude, Geig_Grav, Geig_Lib");
+    Serial.println("Tiempo, Pressure, T_ext,T_int, Humidity, altitude (m), longitude, latitude, Geig_Grav");
     Serial.println(log_entry);
     Serial.println(baChStatus);
     Serial.print("  Batt Voltage = "); 
