@@ -44,15 +44,8 @@ void _screen_header() {
     // Datetime (if the axp192 PMIC is present, alternate between powerstats and time)
     if(axp192_found && millis()%8000 < 3000){
         snprintf(buffer, sizeof(buffer), "%.1fV %.0fmA", axp_192.getBattVoltage()/1000, axp_192.getBattChargeCurrent() - axp_192.getBattDischargeCurrent());
-
-    } else {
-        gps_time(buffer, sizeof(buffer));
-    }
-
-    // Datetime (if the axp2101 PMIC is present, alternate between powerstats and time)
-    if(axp2101_found && millis()%8000 < 3000){
+    } else if (axp2101_found && millis()%8000 < 3000) {
         snprintf(buffer, sizeof(buffer), "%.2fV %d%%", float(axp_2101.getBattVoltage())/1000.0, axp_2101.getBatteryPercent());
-
     } else {
         gps_time(buffer, sizeof(buffer));
     }
