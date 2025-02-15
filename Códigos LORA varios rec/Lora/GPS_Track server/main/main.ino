@@ -31,6 +31,7 @@
 #include "LittleFS.h"
 #include "logger.h"
 #include "FS.h"
+#include "LogEntryTests.h"
 
 #define XPOWERS_CHIP_AXP2101 // Macro that defines the Power Management Unit we are going to use in the new ESP32 modules
 
@@ -42,7 +43,7 @@
 void WebFS(void); // Web server declaration
 void gps_time(char *, uint8_t);
 
-char t_buf[16];
+// char t_buf[16];
 
 
 
@@ -67,6 +68,7 @@ int counter = 0; //Contador de mensajes
 RTC_DATA_ATTR int bootCount = 0;
 esp_sleep_source_t wakeCause;  // the reason we booted this time
 
+/* Se ha pasado al datastruct.h
 typedef struct {
     byte TX_ID = 0x55;
     byte RX_ID = 0xAA;
@@ -84,7 +86,8 @@ typedef struct {
     //unsigned int CP10Sec_Libellium;
 } Data;
 
-Data data;
+Data data; // Data structure deffinition relocated in logger.h
+*/
 
 char log_entry[LINE_SIZE];
 
@@ -128,13 +131,22 @@ void LoRaSend() {
     }
     
     /* Chan: Enviar paquete LoRa */
+    /*
     LoRa.beginPacket();
+    LoRa.write((byte *)&data, sizeof(Data));
+    LoRa.endPacket();
+    */
+    LoRa.beginPacket();
+    if (LoRa.write((byte *)&data, sizeof(Data)) == sizeof(Data)) {
+        LoRa.endPacket();
+        Serial.println("[INFO] Paquete LoRa enviado correctamente.");
+    } else {
+        Serial.println("[ERROR] No se pudo escribir el paquete LoRa.");
+    }
     Serial.print ("Size of data: ");
     Serial.println(sizeof(Data));
     Serial.print ("Number of sats: ");
     Serial.println(gps_sats());
-    LoRa.write((byte *)&data, sizeof(Data));
-    LoRa.endPacket();
 }
 
 
@@ -533,54 +545,13 @@ void loop() {
     LoRaSend();
     data.seq++;
 
-    /*
-    memset(log_entry, 0, LINE_SIZE);
-    //snprintf(log_entry, LINE_SIZE, "%05i: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 \n", data.seq);
     gps_time(t_buf, sizeof(t_buf));
-    printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    */
-    
-    
-    /*
-    memset(log_entry, 0, LINE_SIZE);
-    //snprintf(log_entry, LINE_SIZE, "%05i: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 \n", data.seq);
-    gps_time(t_buf, sizeof(t_buf));
-    printf("%s, %4.2f, %3.2f, %3.2f, %2.2f, %5.2f, %4.6f, %4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    int len = snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f, %d\n", t_buf, data.pressure, data.ext_temperature_ours, data.temperature, data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec);
-    if (len >= LINE_SIZE) {  
-        Serial.printf("[ERROR] Buffer demasiado pequeño: %d bytes escritos en un buffer de %d bytes\n", len, LINE_SIZE);
-    }else{
-        memset(log_entry + len, ' ', LINE_SIZE - 1 - len); // Rellenar con espacios
-    }
-    log_entry[LINE_SIZE - 1] = '\0'; // Asegurar terminación    
-    */
+    LogEntryOriginal(log_entry, data, t_buf);
+    //LogEntryWithTruncateCheck(log_entry, data, t_buf);
+    //LogEntryWithSpaces(log_entry, data, t_buf);
+    //LogEntryWithInterruptProtection(log_entry, data, t_buf);
 
-    // Inicializar el buffer con espacios
-    memset(log_entry, ' ', LINE_SIZE - 1);
-    log_entry[LINE_SIZE - 1] = '\0'; // Terminar correctamente el buffer
-
-    // Generar la marca de tiempo en t_buf
-    gps_time(t_buf, sizeof(t_buf));
-
-    // Usar snprintf para escribir en log_entry
-    int len = snprintf(log_entry, LINE_SIZE, "%s,%4.2f,%3.2f,%3.2f,%2.2f,%5.2f,%4.6f,%4.6f,%d\n",
-                    t_buf, data.pressure, data.ext_temperature_ours, data.temperature,
-                    data.humidity, data.altitude, data.longitude, data.latitude, data.CP10Sec_Gravity);
-
-    // Validar si snprintf truncó la salida
-    if (len >= LINE_SIZE) {
-        Serial.printf("[ERROR] Buffer demasiado pequeño: %d bytes escritos en un buffer de %d bytes\n", len, LINE_SIZE);
-        log_entry[LINE_SIZE - 1] = '\0'; // Terminar correctamente para evitar errores
-    } else {
-        // Rellenar cualquier espacio restante con espacios (evita residuos de \x00)
-        if (len < LINE_SIZE - 1) {
-            memset(log_entry + len, ' ', LINE_SIZE - 1 - len);
-        }
-        log_entry[LINE_SIZE - 1] = '\0'; // Terminar correctamente
-    }
-
-    logger(log_entry); // Max. 22272 records de 64 bytes
+    //logger(log_entry); // Max. 22272 records de 64 bytes
     Serial.print ("Size of log: ");
     Serial.println(sizeof(log_entry));
     Serial.println("Tiempo, Pressure, T_ext,T_int, Humidity, altitude (m), longitude, latitude, Geig_Grav");
