@@ -546,10 +546,10 @@ void loop() {
     data.seq++;
 
     gps_time(t_buf, sizeof(t_buf));
-    LogEntryOriginal(log_entry, data, t_buf);
-    //LogEntryWithTruncateCheck(log_entry, data, t_buf);
-    //LogEntryWithSpaces(log_entry, data, t_buf);
-    //LogEntryWithInterruptProtection(log_entry, data, t_buf);
+    //LogEntryOriginal(log_entry, data, t_buf);
+    //LogEntryWithTruncateCheck(log_entry, data, t_buf); // V1
+    LogEntryWithSpaces(log_entry, data, t_buf); // V2
+    //LogEntryWithInterruptProtection(log_entry, data, t_buf); // V3
 
     //logger(log_entry); // Max. 22272 records de 64 bytes
     Serial.print ("Size of log: ");
