@@ -651,10 +651,10 @@ void setup()
     //MQTT server
 
     const char* brokers[] = {
-        "srs-copper.duckdns.org",
-        "broker.emqx.io",
-        "mqtt-dashboard.com",
-        "192.168.137.46"
+        "srs-copper.duckdns.org", // broker chan
+        "broker.emqx.io",         // broker online
+        "mqtt-dashboard.com",     // broker online
+        "192.168.16.15"           // Broker VPN ambos conectados a la VPN de forma directa
     };
     const int broker_port = 1883;
     int selection = 0; // Broker selection goes between 0 and 3
