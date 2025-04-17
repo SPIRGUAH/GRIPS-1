@@ -3,7 +3,10 @@ import time
 import random
 
 # Configuración del broker MQTT
-broker = "srs-copper.duckdns.org"
+# broker = "srs-copper.duckdns.org" # broker chan
+# broker = "192.168.199.105" # broker S2P
+broker = "192.168.1.141" # Broker wifi casa isma
+
 port = 1883
 
 def generate_random_value(min_val, max_val):

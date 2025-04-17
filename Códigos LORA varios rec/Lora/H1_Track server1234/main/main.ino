@@ -33,7 +33,7 @@
 #define PORT 5055   // Port to access the traccar server
 #define BALLOON_ID 1234 // Beacon ID needed to track
 #define RECEIVER_ID 4321 // ID of each receptor, can be named arbitrarily but needs to be unique in the same network
-#define TRACCAR_SRV "http://srs-copper.duckdns.org"
+#define TRACCAR_SRV "http://srs-copper.duckdns.org" // URL of the traccar server where we locate all the payload and trackers
 
 // Defined using AXP2102
 #define XPOWERS_CHIP_AXP2101
@@ -68,7 +68,7 @@ const char* password = "PASSWORD";  // change this for your own network
 WiFiClient espClient4321;
 PubSubClient client(espClient4321); // Client ID sent to the server
 
-typedef struct {
+typedef struct { // TM struct defined
     byte TX_ID;
     byte RX_ID;
     int seq;
@@ -92,7 +92,7 @@ void buildPacket(uint8_t txBuffer[]);  // needed for platformio
 /**
  * If we have a valid position send it to the server.
  */
-int LoRaReceive() 
+int LoRaReceive()  // Function in charge of receiving and decoding the TM
 {
     char buf[128];
     float latitude;
@@ -295,7 +295,7 @@ void reconnect()
   }
 }
 
-void doDeepSleep(uint64_t msecToWake)
+void doDeepSleep(uint64_t msecToWake) // Function to save energy, currently unused
 {
     Serial.printf("Entering deep sleep for %llu seconds\n", msecToWake / 1000);
 
@@ -363,7 +363,7 @@ void sleep() {
 #endif
 }
 
-void scanI2Cdevice(void)
+void scanI2Cdevice(void) // Function to chech the direcctions I2C connected to the lora receiver
 {
     byte err, addr;
     int nDevices = 0;
@@ -436,7 +436,7 @@ void scanI2Cdevice(void)
 
  */
 
-void axp2101Init() {
+void axp2101Init() { // Initialization for the power management unit 2101
     if (axp2101_found) {
         
         axp_2101.enableTemperatureMeasure();
@@ -518,7 +518,7 @@ void axp2101Init() {
 }
 
 
-void axp192Init() {
+void axp192Init() { // Initialization for the power management unit 192
     if (axp192_found) {
         if (!axp_192.begin(Wire, AXP192_SLAVE_ADDRESS)) {
             Serial.println("AXP192 Begin PASS");
@@ -594,9 +594,11 @@ void setup()
 
     initDeepSleep();
 
+    // Start I2C 
     Wire.begin(I2C_SDA, I2C_SCL);
     scanI2Cdevice();
 
+    // Start power management unit (it only starts the one included, could be improved)
     axp192Init();
     axp2101Init();
 
@@ -654,10 +656,12 @@ void setup()
         "srs-copper.duckdns.org", // broker chan
         "broker.emqx.io",         // broker online
         "mqtt-dashboard.com",     // broker online
-        "192.168.16.15"           // Broker VPN ambos conectados a la VPN de forma directa
+        "192.168.16.15",          // Broker VPN ambos conectados a la VPN de forma indirecta directa (no funciona)
+        "192.168.1.141"           // Conexión local
+
     };
     const int broker_port = 1883;
-    int selection = 0; // Broker selection goes between 0 and 3
+    int selection = 0; // Broker selection goes between 0 and 4
 
     // Broker selection
     const char* selectedBroker = brokers[selection];
@@ -699,9 +703,10 @@ void loop() {
             #endif
         }
     }
+    // Receiving telemetry
     LoRaReceive();
 
-  if (!client.connected()) {
+  if (!client.connected()) { // Try to connect to MQTT server in case it accidentally disconects
     reconnect();
   }
   client.loop();
